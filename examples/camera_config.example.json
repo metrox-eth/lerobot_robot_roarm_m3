@@ -1,0 +1,62 @@
+{
+  "_doc": "Single source of truth for the RoArm-M3 3-camera rig (lerobot 0.5.2). Read by record AND eval via camera_setup.py so the two ALWAYS match (record<->eval consistency). Logical names: wrist (eye-in-hand), side (fixed scene, from the side), top_front (RealSense, top-down from the front). Built 2026-05-30.",
+  "fps": 30,
+  "_doc_fps": "DATASET/LOOP fps = 30 depuis le reflash 1 Mbps du 31/05 (state read ~42 Hz). Unifié record<->eval (commit 0f772b7). Per-camera capture_fps = 30 aussi -> plus de décimation.",
+  "resolution": {
+    "width": 640,
+    "height": 480
+  },
+  "_doc_resolution": "640x480 = 4:3 = ACT/ALOHA convention (our from-scratch ACT keeps native resolution: ResNet has no internal resize). VLAs (SmolVLA 512, MolmoAct) downscale themselves. No high-res superset: ACT would silently train on 4x tokens + record<->eval must match exactly.",
+  "depth_dir": "depth",
+  "_doc_depth": "RealSense depth is dumped IN PARALLEL as 16-bit lossless PNG (mm) under <dataset_root>/depth/<cam>/episode_NNNNNN/frame_NNNNNN.png. lerobot 0.5.2 cannot store uint16 depth in a v3 dataset (image/video = 3ch 8-bit only; h264 would destroy the mm). The v3 dataset stays pure RGB; depth stays metrically intact + re-alignable for MolmoAct.",
+  "_doc_depth_range": "D455F is a LONG-range sensor (D405 is the usual close-range one). At 640x480 disparity_shift=0: Min-Z 34cm, 72% coverage. Measured 2026-05-30: cubes at 73cm, arm clearance to the top cam never below 40cm > 34cm -> shift=0 covers the whole work zone, keeps 4:3 homogeneous. DO NOT add disparity_shift here: at 640 a shift of 50 over-shifts and KILLS mid-range coverage (72%->36%). If the top cam is ever lowered so something comes within 34cm, switch top_front to 848x480 (16:9) + disparity_shift 50 (Min-Z 24cm, 69% cov) via rs400_advanced_mode set_depth_table.",
+  "cameras": {
+    "wrist": {
+      "type": "opencv",
+      "index_or_path": "/dev/v4l/by-path/pci-0000:75:00.0-usb-0:1:1.0-video-index0",
+      "capture_fps": 30,
+      "rotation": 0,
+      "color_mode": "rgb",
+      "backend": "v4l2",
+      "_doc": "Eye-in-hand. NO rotation since the 2026-05-30 wrist_roll re-zero. Chemin by-path KERNEL (stable, zéro règle udev — les symlinks /dev/video_wrist sont morts au reboot du 10/06). PCIe 75:00.0 = son contrôleur dédié. Identifiée VISUELLEMENT le 12/06 (mâchoires Gripper B visibles).",
+      "v4l2_controls": {
+        "white_balance_automatic": 0,
+        "white_balance_temperature": 4600,
+        "auto_exposure": 3,
+        "exposure_dynamic_framerate": 0
+      },
+      "_doc_controls": "Voie A: freeze WB (kills the tint drift); KEEP auto_exposure=3 (aperture-priority) because these webcams expose NO manual gain in V4L2 -> a fixed exposure goes dark. dynamic_framerate=0 keeps fps stable."
+    },
+    "side": {
+      "type": "opencv",
+      "index_or_path": "/dev/v4l/by-path/pci-0000:76:00.0-usb-0:1:1.0-video-index0",
+      "capture_fps": 30,
+      "rotation": 0,
+      "color_mode": "rgb",
+      "backend": "v4l2",
+      "_doc": "Fixed scene camera, side view. Chemin by-path KERNEL (stable, zéro règle udev). PCIe 76:00.0 = son contrôleur dédié. Identifiée VISUELLEMENT le 12/06 (table + bras + bac bleu). ⚠ by-path = stable tant qu'on ne rebranche pas sur un autre port physique.",
+      "v4l2_controls": {
+        "white_balance_automatic": 0,
+        "white_balance_temperature": 4600,
+        "auto_exposure": 3,
+        "exposure_dynamic_framerate": 0
+      }
+    },
+    "top_front": {
+      "type": "intelrealsense",
+      "serial_number_or_name": "338122302234",
+      "capture_fps": 30,
+      "rotation": 0,
+      "color_mode": "rgb",
+      "use_depth": true,
+      "dump_depth": true,
+      "_doc": "RealSense D455F, top-down from the front (MolmoAct-style overhead). use_depth opens the z16 stream; dump_depth writes it as parallel 16-bit PNG (see depth_dir).",
+      "rs_options": {
+        "settle_then_lock": true,
+        "enable_auto_white_balance": 0,
+        "white_balance": 4600
+      },
+      "_doc_options": "settle_then_lock: let auto-exposure settle on the scene, read the value, then lock AE off at that value (preserves correct brightness). WB forced to 4600 to match the USB cams as closely as a different sensor allows."
+    }
+  }
+}

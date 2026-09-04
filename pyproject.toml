@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lerobot_robot_roarm_m3"
+version = "0.1.0"
+description = "Waveshare RoArm-M3 follower plugin for LeRobot (third-party device, no fork needed). Verified on real hardware with LeRobot 0.5.2."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+authors = [{ name = "Show Robotics (metrox)" }]
+keywords = ["lerobot", "roarm", "waveshare", "robot", "imitation-learning"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+# The distribution name MUST equal the importable module name and start with
+# `lerobot_robot_`: that is how lerobot's register_third_party_plugins() finds it.
+dependencies = [
+    "lerobot>=0.5.2",
+    "numpy",
+    "roarm_sdk>=0.1.0,<0.2.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/metrox-eth/lerobot_robot_roarm_m3"
+Issues = "https://github.com/metrox-eth/lerobot_robot_roarm_m3/issues"
+
+[tool.setuptools]
+packages = ["lerobot_robot_roarm_m3"]
