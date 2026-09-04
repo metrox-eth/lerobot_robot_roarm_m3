@@ -67,6 +67,12 @@ same images; `examples/camera_config.example.json` is our three-camera rig (two 
 - **Dupont connectors** and a Raspberry-Pi-class host talking straight to the arm cost us weeks. A serial
   adapter that does 1 Mbps cleanly, and short cables, matter more than any code here.
 
+## Simulation: the arm and its gripper in MuJoCo
+
+`sim/` has our MJCF of the RoArm-M3 with the parallel-jaw gripper (gripper B) as an exact parallelogram rig,
+pivots extracted from the part STLs, plus the kinematics script and its validation. Waveshare's meshes are
+fetched from their repository, not redistributed. See `sim/README.md`.
+
 ## Status and scope
 
 Follower only. A passive RoArm-M3 leader teleoperator exists in the original PR branch and will be

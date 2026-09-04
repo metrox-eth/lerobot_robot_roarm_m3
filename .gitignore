@@ -4,3 +4,10 @@ __pycache__/
 .pytest_cache/
 build/
 dist/
+# Waveshare meshes are fetched/exported locally, never committed
+sim/meshes/*.stl
+sim/meshes/gripper_b_parts/*
+!sim/meshes/gripper_b_parts/jaw_thin_L.stl
+!sim/meshes/gripper_b_parts/jaw_thin_R.stl
+!sim/meshes/gripper_b_parts/claw_ext_L.stl
+!sim/meshes/gripper_b_parts/claw_ext_R.stl

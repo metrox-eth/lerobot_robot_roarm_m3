@@ -1,0 +1,211 @@
+<mujoco model="roarm_m3_gripper_b">
+  <!-- Waveshare RoArm-M3 + "High-performance Robotic Arm Gripper" (gripper B), MuJoCo.
+       Show Robotics, 2026 (Apache-2.0 for this file). Meshes are NOT in this repository:
+       run fetch_meshes.sh for the arm links (Waveshare roarm_ws) and read README.md for
+       the gripper parts (Waveshare STEP -> STL in assembly coordinates). -->
+  <compiler angle="radian" meshdir="meshes/"/>
+  <option gravity="0 0 -9.81" timestep="0.002"/>
+  <visual>
+    <headlight ambient="0.35 0.35 0.38" diffuse="0.6 0.6 0.6" specular="0.1 0.1 0.1"/>
+    <global offwidth="1280" offheight="720"/>
+  </visual>
+
+  <asset>
+    <mesh name="base_link"    content_type="model/stl" file="base_link.stl"    scale="0.001 0.001 0.001"/>
+    <mesh name="link1"        content_type="model/stl" file="link1.stl"        scale="0.001 0.001 0.001"/>
+    <mesh name="link2"        content_type="model/stl" file="link2.stl"        scale="0.001 0.001 0.001"/>
+    <mesh name="link3"        content_type="model/stl" file="link3.stl"        scale="0.001 0.001 0.001"/>
+    <mesh name="link4"        content_type="model/stl" file="link4.stl"        scale="0.001 0.001 0.001"/>
+    <mesh name="link5"        content_type="model/stl" file="link5.stl"        scale="0.001 0.001 0.001"/>
+    <mesh name="gripper_link" content_type="model/stl" file="gripper_link.stl" scale="0.001 0.001 0.001"/>
+    <!-- Gripper B SEPARATED parts (from Fusion 360 assembly export, 2026-05-24).
+         All STLs are in ASSEMBLY coordinates — loading them all at the SAME
+         pos/quat reassembles the gripper automatically. No per-part calibration
+         needed. spacer.stl (8 instances) + bushing.stl (16 instances) skipped
+         in V1 (visual cosmetics, 1 visible instance would be misleading). -->
+    <mesh name="gb_body"          content_type="model/stl" file="gripper_b_parts/body.stl"           scale="0.001 0.001 0.001"/>
+    <mesh name="gb_sevo_cog"      content_type="model/stl" file="gripper_b_parts/sevo_cog.stl"       scale="0.001 0.001 0.001"/>
+    <mesh name="gb_lever_top_L"   content_type="model/stl" file="gripper_b_parts/lever_top_L.stl"    scale="0.001 0.001 0.001"/>
+    <mesh name="gb_lever_top_R"   content_type="model/stl" file="gripper_b_parts/lever_top_R.stl"    scale="0.001 0.001 0.001"/>
+    <mesh name="gb_lever_bot_L"   content_type="model/stl" file="gripper_b_parts/lever_bottom_L.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="gb_lever_bot_R"   content_type="model/stl" file="gripper_b_parts/lever_bottom_R.stl" scale="0.001 0.001 0.001"/>
+    <mesh name="gb_gripper_L"     content_type="model/stl" file="gripper_b_parts/gripper_L.stl"      scale="0.001 0.001 0.001"/>
+    <mesh name="gb_gripper_R"     content_type="model/stl" file="gripper_b_parts/gripper_R.stl"      scale="0.001 0.001 0.001"/>
+    <!-- Pince RÉELLE (2026-06-10, validée metrox maquette D) : lame centrale
+         1.5mm (pivots) + 2 claw extensions par mâchoire sur entretoises 6×15.
+         Extraites de l'assemblage metrox (1.stl) + claw_extension.stl (miroir R). -->
+    <mesh name="gb_jaw_thin_L"    content_type="model/stl" file="gripper_b_parts/jaw_thin_L.stl"     scale="0.001 0.001 0.001"/>
+    <mesh name="gb_jaw_thin_R"    content_type="model/stl" file="gripper_b_parts/jaw_thin_R.stl"     scale="0.001 0.001 0.001"/>
+    <mesh name="gb_claw_ext_L"    content_type="model/stl" file="gripper_b_parts/claw_ext_L.stl"     scale="0.001 0.001 0.001"/>
+    <mesh name="gb_claw_ext_R"    content_type="model/stl" file="gripper_b_parts/claw_ext_R.stl"     scale="0.001 0.001 0.001"/>
+  </asset>
+
+  <worldbody>
+    <light pos="0.5 -0.5 1.5" dir="-0.3 0.3 -1"/>
+    <light pos="-0.5 0.5 1.5" dir="0.3 -0.3 -1"/>
+    <geom name="floor" type="plane" size="1 1 0.1" pos="0 0 0" rgba="0.9 0.9 0.9 1"/>
+
+
+    <!-- ── RoArm M3 robot ─────────────────────────────────────────────────── -->
+    <!-- root à 0.0711 = 0.0701 URDF + 1mm (bas du mesh base_link → z=0 exact) -->
+    <geom name="base_link_geom" pos="0 0 0.0711" quat="1 0 0 0" type="mesh" rgba="0.7 0.7 0.7 1" mesh="base_link"/>
+
+    <body name="link1" pos="0 0 0.0711">
+      <inertial pos="0 0 0.037" quat="0.5 0.5 -0.5 0.5" mass="0.0729177" diaginertia="5.01023e-05 4.68465e-05 3.32107e-05"/>
+      <joint name="base_link_to_link1" pos="0 0 0" axis="0 0 1" range="-3.1416 3.1416"/>
+      <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="link1"/>
+
+      <body name="link2" pos="0 0 0.051959" quat="0.499998 -0.5 -0.5 -0.500002">
+        <inertial pos="0.119 0.012247 -0.0001" quat="0.5 0.5 0.5 0.5" mass="0.0703216" diaginertia="0.000423091 0.000404557 5.46501e-05"/>
+        <joint name="link1_to_link2" pos="0 0 0" axis="0 0 1" range="-2.3 1.8"/>
+        <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="link2"/>
+
+        <body name="link3" pos="0.236815 0.030002 0" quat="0.707105 0 0 0.707108">
+          <inertial pos="-0.0015 -0.0765 0.00505" quat="0.707107 0.707107 0 0" mass="0.021608" diaginertia="6.37699e-05 6.28965e-05 3.67026e-06"/>
+          <joint name="link2_to_link3" pos="0 0 0" axis="0 0 1" range="-3.2 3.49"/>
+          <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="link3"/>
+
+          <body name="link4" pos="0 -0.144586 0">
+            <inertial pos="-0.0015 -0.022 -0.00075" quat="0.5 0.5 -0.5 0.5" mass="0.0099933" diaginertia="5.60238e-06 4.53979e-06 3.78103e-06"/>
+            <joint name="link3_to_link4" pos="0 0 0" axis="0 0 1" range="-2.4 1.7"/>
+            <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="link4"/>
+
+            <body name="link5" pos="0.015147 -0.053653 0" quat="0.499998 0.5 0.5 -0.500002">
+              <inertial pos="-0.0078 0 0.0595" quat="0.707107 0 0 0.707107" mass="0.0153928" diaginertia="2.14427e-05 2.02869e-05 4.39495e-06"/>
+              <joint name="link4_to_link5" pos="0 0 0" axis="0 0 1" range="-3.1416 3.1416"/>
+              <!-- link5 = wrist_roll. Gripper B + wrist_cam REPARENTÉS ICI
+                   (2026-06-10) : sur le vrai robot ils roulent avec le poignet.
+                   V2 les avait sous link4 → le roll ne tournait rien de visible.
+                   Transforms gb_root/cam = inv(T_l4_l5)·T_l4_*, calcul numérique ;
+                   à roll=0 le rendu est identique à avant (continuité). -->
+
+            <!-- Gripper B V3 PARALLELOGRAM RIG (2026-06-10).
+                 gb_root applies the calibrated assembly transform once. Inside it,
+                 all positions are in Fusion assembly coords (m). Body geoms get
+                 negative-pivot offsets so the meshes render at their absolute
+                 assembly positions. Pivot axis = local Z (V2 calibration kept).
+                 TRUE topology (bores extracted numerically from the STLs —
+                 sim/gripper_b_kinematics.py, every pivot cross-checked <0.1mm):
+                 each side is a perfect PARALLELOGRAM (parallel-jaw gripper):
+                   body(ground) A=gear-lever pivot, G=small-lever pivot
+                   gear lever A->P1 = 43.2mm ; small lever G->P2 = 43.2mm
+                   jaw (coupler) P1->P2 = 29.7mm = |A->G|  => jaw TRANSLATES,
+                   never rotates: qpos law = bot=+theta_gear, jaw=-theta_gear.
+                 V2 had the bot-lever ground pivot and the jaw hinge swapped
+                 end-for-end (hence the documented 3mm drift + jaw rotation).
+                 Gears: servo cog -> gear_L -> gear_R, 21 teeth, 1:1 (21mm axes). -->
+            <!-- gb_root recalé 2026-06-11 (metrox) : les 4 trous de montage (centre
+                 X=13.99, Z=282.1 assemblage = plan des pivots) doivent être au centre
+                 du pignon du servo de roll — l'ancien calage excentrait l'axe de
+                 4.3mm en X (l'offset systématique du solveur !) et 13.2mm en Z. -->
+            <body name="gb_root" pos="0.01399 -0.282099 -0.492452" quat="0 0 0.7071 0.7071">
+
+              <geom type="mesh" rgba="0.55 0.55 0.65 1" mesh="gb_body"/>
+              <!-- centre de pince au repos (entre les faces internes des doigts,
+                   coords assembly) — référence grasp/cube de la page SIM.
+                   Y=567 = pointes des doigts (577.5) − 10mm : le cube se prend
+                   vers le BOUT des doigts (retour metrox 2026-06-10 : à 560 le
+                   cube paraissait collé au mécanisme), il déborde ~2mm sous les
+                   pointes comme une vraie prise. -->
+              <!-- Z recalé pour la pince réelle : milieu des deux bandes de
+                   contact des extensions (253.6-258.6 / 290.1-295.1 → 274.35) -->
+              <site name="gb_tcp" pos="0.013989 0.567 0.27435" size="0.003" rgba="1 0 1 0"/>
+
+              <body name="gb_sevo_cog" pos="0.001489 0.514006 0.26194">
+                <joint name="grip_servo" type="hinge" axis="0 0 1" range="-1.6 1.6"/>
+                <geom type="mesh" rgba="0.85 0.75 0.30 1" mesh="gb_sevo_cog"
+                      pos="-0.001489 -0.514006 -0.26194"/>
+              </body>
+
+              <body name="gb_lever_top_L" pos="0.003489 0.53491 0.27574">
+                <joint name="grip_top_L" type="hinge" axis="0 0 1" range="-1.6 1.6"/>
+                <geom type="mesh" rgba="0.70 0.70 0.80 1" mesh="gb_lever_top_L"
+                      pos="-0.003489 -0.53491 -0.27574"/>
+
+                <!-- jaw rides the GEAR lever at junction P1 (parallelogram coupler) -->
+                <body name="gb_gripper_L" pos="-0.0432 0 0.006">
+                  <joint name="grip_jaw_L" type="hinge" axis="0 0 1" range="-1.6 1.6"/>
+                  <!-- pince réelle : lame 1.5mm + 2 extensions (±15mm) + 4 entretoises 6×15 -->
+                  <geom type="mesh" rgba="0.60 0.60 0.70 1" mesh="gb_jaw_thin_L"
+                        pos="0.039711 -0.53491 -0.28174"/>
+                  <geom type="mesh" rgba="0.80 0.50 0.50 1" mesh="gb_claw_ext_L"
+                        pos="0.039711 -0.53491 -0.29674"/>
+                  <geom type="mesh" rgba="0.80 0.50 0.50 1" mesh="gb_claw_ext_L"
+                        pos="0.039711 -0.53491 -0.26024"/>
+                  <geom type="cylinder" size="0.003 0.0075" pos="0.007451 0.01539 -0.01564" rgba="0.75 0.75 0.78 1"/>
+                  <geom type="cylinder" size="0.003 0.0075" pos="0.007471 0.03040 -0.01564" rgba="0.75 0.75 0.78 1"/>
+                  <geom type="cylinder" size="0.003 0.0075" pos="0.007451 0.01539 0.00086" rgba="0.75 0.75 0.78 1"/>
+                  <geom type="cylinder" size="0.003 0.0075" pos="0.007471 0.03040 0.00086" rgba="0.75 0.75 0.78 1"/>
+                </body>
+              </body>
+
+              <body name="gb_lever_top_R" pos="0.024489 0.53491 0.27574">
+                <joint name="grip_top_R" type="hinge" axis="0 0 1" range="-1.6 1.6"/>
+                <geom type="mesh" rgba="0.70 0.70 0.80 1" mesh="gb_lever_top_R"
+                      pos="-0.024489 -0.53491 -0.27574"/>
+
+                <body name="gb_gripper_R" pos="0.0432 0 0.006">
+                  <joint name="grip_jaw_R" type="hinge" axis="0 0 1" range="-1.6 1.6"/>
+                  <geom type="mesh" rgba="0.60 0.60 0.70 1" mesh="gb_jaw_thin_R"
+                        pos="-0.067689 -0.53491 -0.28174"/>
+                  <geom type="mesh" rgba="0.80 0.50 0.50 1" mesh="gb_claw_ext_R"
+                        pos="-0.067689 -0.53491 -0.29674"/>
+                  <geom type="mesh" rgba="0.80 0.50 0.50 1" mesh="gb_claw_ext_R"
+                        pos="-0.067689 -0.53491 -0.26024"/>
+                  <geom type="cylinder" size="0.003 0.0075" pos="-0.007451 0.01539 -0.01564" rgba="0.75 0.75 0.78 1"/>
+                  <geom type="cylinder" size="0.003 0.0075" pos="-0.007471 0.03040 -0.01564" rgba="0.75 0.75 0.78 1"/>
+                  <geom type="cylinder" size="0.003 0.0075" pos="-0.007451 0.01539 0.00086" rgba="0.75 0.75 0.78 1"/>
+                  <geom type="cylinder" size="0.003 0.0075" pos="-0.007471 0.03040 0.00086" rgba="0.75 0.75 0.78 1"/>
+                </body>
+              </body>
+
+              <!-- small levers: ground pivot G on the body (V2 had them hinged
+                   at P1 with the jaw hinge at G — swapped; fixed in V3) -->
+              <body name="gb_lever_bot_L" pos="-0.017511 0.51391 0.27574">
+                <joint name="grip_bot_L" type="hinge" axis="0 0 1" range="-1.6 1.6"/>
+                <geom type="mesh" rgba="0.65 0.65 0.75 1" mesh="gb_lever_bot_L"
+                      pos="0.017511 -0.51391 -0.27574"/>
+              </body>
+
+              <body name="gb_lever_bot_R" pos="0.045489 0.51391 0.27574">
+                <joint name="grip_bot_R" type="hinge" axis="0 0 1" range="-1.6 1.6"/>
+                <geom type="mesh" rgba="0.65 0.65 0.75 1" mesh="gb_lever_bot_R"
+                      pos="-0.045489 -0.51391 -0.27574"/>
+              </body>
+
+            </body>
+
+            <!-- Wrist camera — rigide sur le gripper, ROULE avec le poignet
+                 (reparentée sous link5 2026-06-10). Orientation visuelle V2
+                 conservée à roll=0 (transform recalculé numériquement). -->
+            <camera name="wrist_cam" pos="-0.005 0.004853 0.051347" xyaxes="1 0 0 0 -1 0" fovy="100"/>
+
+
+              <body name="gripper_link" pos="0 0.018821 0.052035" quat="0.499998 -0.5 -0.5 -0.500002">
+                <inertial pos="0.027 0.0027 -0.018935" quat="0.5 0.5 0.5 0.5" mass="0.0028708" diaginertia="1.82071e-06 1.60231e-06 5.23216e-07"/>
+                <joint name="link5_to_gripper_link" pos="0 0 0" axis="0 0 1" range="-0.05 1.5708"/>
+                <!-- Body kept (joint required by IK chain + actuators) but
+                     no visible mesh. -->
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <!-- <equality> intentionally omitted: MuJoCo's kinematic mode (mj_forward on qpos)
+       does not enforce equalities. The 7 gripper joints follow the exact parallelogram
+       cascade in gripper_b_kinematics.py (set_grip(theta)): servo=-θ, top_L=+θ, top_R=-θ,
+       bot_L=+θ, bot_R=-θ, jaw_L=-θ, jaw_R=+θ. -->
+
+  <actuator>
+    <position name="act_joint0" joint="base_link_to_link1"   kp="200" ctrlrange="-3.1416 3.1416"/>
+    <position name="act_joint1" joint="link1_to_link2"       kp="200" ctrlrange="-1.92 1.5708"/>
+    <position name="act_joint2" joint="link2_to_link3"       kp="200" ctrlrange="-1.13 3.49"/>
+    <position name="act_joint3" joint="link3_to_link4"       kp="200" ctrlrange="-2.09 1.5708"/>
+    <position name="act_joint4" joint="link4_to_link5"       kp="200" ctrlrange="-3.1416 3.1416"/>
+    <position name="act_joint5" joint="link5_to_gripper_link" kp="100" ctrlrange="-0.05 1.5708"/>
+    <position name="act_grip_servo" joint="grip_servo" kp="50" ctrlrange="-0.6 0.6"/>
+  </actuator>
+</mujoco>
